@@ -24,10 +24,10 @@ class IdempotencyRecordRepositoryTest {
     @Test
     void secondRecordWithSameKeyIsRejectedNotOverwritten() {
         repository.saveAndFlush(new IdempotencyRecord(
-                "key-1", "hash-a", UUID.randomUUID(), 201, "{\"first\":true}", Instant.now()));
+                "key-1", "hash-a", UUID.randomUUID(), "{\"first\":true}", Instant.now()));
 
         assertThatThrownBy(() -> repository.saveAndFlush(new IdempotencyRecord(
-                "key-1", "hash-b", UUID.randomUUID(), 201, "{\"second\":true}", Instant.now())))
+                "key-1", "hash-b", UUID.randomUUID(), "{\"second\":true}", Instant.now())))
                 .isInstanceOf(DataIntegrityViolationException.class);
     }
 }

@@ -21,9 +21,10 @@ import org.springframework.data.domain.Persistable;
  * {@code Transaction} it created, so the two commit together or not at all. A visible
  * record therefore always has a complete response to replay.
  *
- * <p>The response is stored as a snapshot (status code and JSON body), not re-rendered from
- * the transaction. A retry after the bet has settled still gets the original 201 PENDING
- * response, which is what "returns the original response" means.
+ * <p>The response body is stored as a JSON snapshot, not re-rendered from the transaction.
+ * A retry after the bet has settled still gets the original 201 PENDING response, which is
+ * what "returns the original response" means. Only successful creates are recorded (always
+ * 201), so no status code is stored. Failed requests leave no record and are safe to retry.
  */
 @Entity
 @Table(name = "idempotency_records")
@@ -39,9 +40,6 @@ public class IdempotencyRecord implements Persistable<String> {
 
     @Column(name = "transaction_id", nullable = false)
     private UUID transactionId;
-
-    @Column(name = "response_status", nullable = false)
-    private int responseStatus;
 
     @Lob
     @Column(name = "response_body", nullable = false)
@@ -75,11 +73,10 @@ public class IdempotencyRecord implements Persistable<String> {
     }
 
     public IdempotencyRecord(String key, String requestHash, UUID transactionId,
-                             int responseStatus, String responseBody, Instant createdAt) {
+                             String responseBody, Instant createdAt) {
         this.key = key;
         this.requestHash = requestHash;
         this.transactionId = transactionId;
-        this.responseStatus = responseStatus;
         this.responseBody = responseBody;
         this.createdAt = createdAt.truncatedTo(ChronoUnit.MILLIS);
     }
@@ -95,10 +92,6 @@ public class IdempotencyRecord implements Persistable<String> {
 
     public UUID getTransactionId() {
         return transactionId;
-    }
-
-    public int getResponseStatus() {
-        return responseStatus;
     }
 
     public String getResponseBody() {

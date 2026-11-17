@@ -11,6 +11,7 @@ import jakarta.persistence.Transient;
 import jakarta.persistence.Index;
 import jakarta.persistence.Table;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.UUID;
@@ -101,13 +102,16 @@ public class Transaction implements Persistable<UUID> {
      * database, so the full response is known before commit. The idempotency record stores
      * that response in the same database transaction.
      *
-     * <p>createdAt is truncated to milliseconds so the value we return now matches what the
-     * database hands back on later reads.
+     * <p>createdAt is truncated to milliseconds and betAmount is set to scale 2 so the values
+     * we return now match what the database hands back on later reads ("5" becomes "5.00").
+     * RoundingMode.UNNECESSARY throws instead of silently rounding if more than 2 decimals
+     * ever slip past validation.
      */
     public static Transaction pending(String roundId, String playerId, String gameName,
                                       BigDecimal betAmount, String currency, Instant now) {
         return new Transaction(UUID.randomUUID(), roundId, playerId, gameName,
-                betAmount, currency, now.truncatedTo(ChronoUnit.MILLIS));
+                betAmount.setScale(2, RoundingMode.UNNECESSARY), currency,
+                now.truncatedTo(ChronoUnit.MILLIS));
     }
 
     @Override
