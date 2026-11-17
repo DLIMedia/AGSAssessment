@@ -1,0 +1,75 @@
+{
+  // All tasks go through the Maven wrapper, so they behave exactly like the README commands.
+  // Ctrl+Shift+P > "Tasks: Run Task" lists them; "Tasks: Run Test Task" runs the default test task.
+  "version": "2.0.0",
+  "options": {
+    "cwd": "${workspaceFolder}"
+  },
+  "windows": {
+    "command": ".\\mvnw.cmd"
+  },
+  "command": "./mvnw",
+  "type": "shell",
+  "tasks": [
+    {
+      "label": "mvn: test",
+      "detail": "Run the whole test suite",
+      "args": ["-B", "test"],
+      "group": { "kind": "test", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "mvn: test current file",
+      "detail": "Run only the test class open in the editor",
+      "args": ["-B", "test", "-Dtest=${fileBasenameNoExtension}", "-Dsurefire.failIfNoSpecifiedTests=false"],
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "mvn: clean verify",
+      "detail": "Full clean build: compile, test, package",
+      "args": ["-B", "clean", "verify"],
+      "group": { "kind": "build", "isDefault": true },
+      "problemMatcher": []
+    },
+    {
+      "label": "mvn: run app",
+      "detail": "Start the service on http://localhost:8080",
+      "args": ["spring-boot:run"],
+      "isBackground": true,
+      "problemMatcher": []
+    },
+    {
+      // Used by the "Debug tests in current file (Maven)" launch config. Surefire pauses the
+      // test JVM until a debugger attaches on port 5005; the background pattern tells VS Code
+      // when that point is reached so it can attach.
+      "label": "mvn: debug tests in current file (wait on 5005)",
+      "args": ["-B", "test", "-Dtest=${fileBasenameNoExtension}", "-Dsurefire.failIfNoSpecifiedTests=false", "-Dmaven.surefire.debug"],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "java",
+        "pattern": { "regexp": "^__never_matches__$" },
+        "background": {
+          "activesBegin": ".",
+          "beginsPattern": "Scanning for projects",
+          "endsPattern": "Listening for transport dt_socket at address: 5005"
+        }
+      }
+    },
+    {
+      // Starts the app through Maven, paused until a debugger attaches on port 5005.
+      "label": "mvn: debug app (wait on 5005)",
+      "args": ["spring-boot:run", "-Dspring-boot.run.jvmArguments=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=localhost:5005"],
+      "isBackground": true,
+      "problemMatcher": {
+        "owner": "java",
+        "pattern": { "regexp": "^__never_matches__$" },
+        "background": {
+          "activesBegin": ".",
+          "beginsPattern": "Scanning for projects",
+          "endsPattern": "Listening for transport dt_socket at address: 5005"
+        }
+      }
+    }
+  ]
+}

@@ -33,7 +33,10 @@ HELP.md
 *.iml
 *.iws
 *.ipr
-.vscode/
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
 .classpath
 .project
 .settings/

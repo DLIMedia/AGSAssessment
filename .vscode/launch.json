@@ -1,0 +1,41 @@
+{
+  // Needs the "Extension Pack for Java" (see extensions.json).
+  // For single tests you can also use the Testing sidebar or the "Run Test | Debug Test"
+  // links above each @Test; those don't need anything in this file.
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug app",
+      "request": "launch",
+      "mainClass": "com.ags.transactions.TransactionsServiceApplication",
+      "projectName": "transactions-service",
+      "cwd": "${workspaceFolder}"
+    },
+    {
+      "type": "java",
+      "name": "Debug app (via Maven)",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005,
+      "preLaunchTask": "mvn: debug app (wait on 5005)"
+    },
+    {
+      // Runs the open test class exactly as Maven does (same classpath and Surefire settings)
+      // and attaches the debugger. Handy for stepping through the concurrency tests.
+      "type": "java",
+      "name": "Debug tests in current file (Maven)",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005,
+      "preLaunchTask": "mvn: debug tests in current file (wait on 5005)"
+    },
+    {
+      "type": "java",
+      "name": "Attach to JVM on port 5005",
+      "request": "attach",
+      "hostName": "localhost",
+      "port": 5005
+    }
+  ]
+}

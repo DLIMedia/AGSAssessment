@@ -1,0 +1,7 @@
+{
+  // VS Code prompts to install these when the folder is opened.
+  // The Java pack includes language support, the debugger, the test runner and Maven.
+  "recommendations": [
+    "vscjava.vscode-java-pack"
+  ]
+}
