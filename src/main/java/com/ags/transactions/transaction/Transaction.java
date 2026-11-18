@@ -32,6 +32,13 @@ import org.springframework.data.domain.Persistable;
 })
 public class Transaction implements Persistable<UUID> {
 
+    /**
+     * Amount columns are precision 19, scale 2, so at most 17 digits before the decimal point.
+     * Both betAmount (POST) and winAmount (PATCH) are checked against this before they reach
+     * the database; a larger value would otherwise fail at the INSERT/UPDATE as a 500.
+     */
+    public static final int MAX_AMOUNT_INTEGER_DIGITS = 17;
+
     @Id
     private UUID id;
 

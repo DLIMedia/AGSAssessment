@@ -1,6 +1,7 @@
 package com.ags.transactions.api;
 
 import com.ags.transactions.transaction.NewTransaction;
+import com.ags.transactions.transaction.Transaction;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +22,7 @@ public record CreateTransactionRequest(
         @NotBlank @Size(max = 255) String roundId,
         @NotBlank @Size(max = 255) String playerId,
         @NotBlank @Size(max = 255) String gameName,
-        @NotNull @Positive @Digits(integer = 17, fraction = 2) BigDecimal betAmount,
+        @NotNull @Positive @Digits(integer = Transaction.MAX_AMOUNT_INTEGER_DIGITS, fraction = 2) BigDecimal betAmount,
         @NotNull @IsoCurrency String currency) {
 
     NewTransaction toNewTransaction() {

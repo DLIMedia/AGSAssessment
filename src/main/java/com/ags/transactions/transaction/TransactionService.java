@@ -172,6 +172,11 @@ public class TransactionService {
         if (winAmount.stripTrailingZeros().scale() > 2) {
             throw new InvalidSettlementException("winAmount must have at most 2 decimal places");
         }
-        return winAmount.setScale(2, RoundingMode.UNNECESSARY);
+        BigDecimal normalized = winAmount.setScale(2, RoundingMode.UNNECESSARY);
+        if (normalized.precision() - normalized.scale() > Transaction.MAX_AMOUNT_INTEGER_DIGITS) {
+            throw new InvalidSettlementException(
+                    "winAmount must have at most " + Transaction.MAX_AMOUNT_INTEGER_DIGITS + " digits before the decimal point");
+        }
+        return normalized;
     }
 }

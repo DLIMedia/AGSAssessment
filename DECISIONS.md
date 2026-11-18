@@ -52,7 +52,8 @@ exception type, which is harder to follow.
 I used Claude for the scaffold, for suggesting approaches that I then picked from, for drafting
 tests that I read and tightened, and for explaining Spring and Hibernate behaviour. My rule was
 that nothing went in unless I could explain it, and every concurrency claim had to be proven by
-a test against the real database. That rule is what caught the three problems below.
+a test against the real database. That rule is what caught the first three problems below. The
+fourth got past it, and I only found it by running the app by hand.
 
 - **It would have silently overwritten keys.** The first version of the entities used assigned
   ids with a plain `save()`. Spring Data treats an assigned id as "existing" and merges it, so a
@@ -66,6 +67,13 @@ a test against the real database. That rule is what caught the three problems be
 - **It added a polling loop I didn't need.** It suggested polling for the winner's record after
   a duplicate key. A test that holds the first request open showed the database was already
   doing the waiting, so I removed the loop and the extra timeout setting that came with it.
+- **It missed a size limit on PATCH.** For my final check against the spec I ran the README
+  curls plus some edge cases against the running app. Completing a bet with a `winAmount` too
+  big for the column (more than 17 digits before the decimal point) came back as a 500. The
+  POST body already had that limit, but the PATCH rules are checked in the service, and nobody
+  had added it there. Now both use the same constant, so it's a 400. I added a test for the
+  rejected value and one for the largest value that fits, and checked the rejection tests fail
+  without the fix. The tests had only covered the cases I thought to write down.
 
 I rejected its default of 409 for duplicate POSTs (I wanted the wait), and the H2 web console
 the scaffold added. I accepted the core design, the latch-based helper that makes test threads

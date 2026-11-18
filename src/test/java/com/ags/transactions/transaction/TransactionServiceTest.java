@@ -155,6 +155,7 @@ class TransactionServiceTest {
             "COMPLETED, null",    // winAmount required
             "COMPLETED, -1.00",   // negative win
             "COMPLETED, 1.005",   // more than 2 decimals
+            "COMPLETED, 100000000000000000.00", // 18 integer digits: too big for the column
             "CANCELLED, 0.00",    // winAmount must not be sent on cancel
     })
     void invalidSettlementIsRejectedAndChangesNothing(TransactionStatus target, BigDecimal winAmount) {
@@ -163,6 +164,16 @@ class TransactionServiceTest {
         assertThatThrownBy(() -> service.settle(id, target, winAmount))
                 .isInstanceOf(InvalidSettlementException.class);
         assertThat(service.get(id).status()).isEqualTo(TransactionStatus.PENDING);
+    }
+
+    /** The largest winAmount the column can hold is accepted, so the size check isn't off by one. */
+    @Test
+    void largestWinAmountThatFitsTheColumnIsAccepted() {
+        UUID id = service.create(newKey(), bet("5.00")).transaction().transactionId();
+        BigDecimal largest = new BigDecimal("99999999999999999.99");
+
+        assertThat(service.settle(id, TransactionStatus.COMPLETED, largest).winAmount()).isEqualTo(largest);
+        assertThat(service.get(id).winAmount()).isEqualTo(largest);
     }
 
     /**

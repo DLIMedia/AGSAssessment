@@ -256,6 +256,7 @@ class TransactionApiTest {
             {"status": "COMPLETED"}
             {"status": "COMPLETED", "winAmount": -1}
             {"status": "COMPLETED", "winAmount": 1.001}
+            {"status": "COMPLETED", "winAmount": 100000000000000000000}
             {"status": "CANCELLED", "winAmount": 0}
             {"status": "PENDING"}
             {"status": "NOPE"}
